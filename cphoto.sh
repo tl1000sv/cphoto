@@ -8,7 +8,9 @@ TEST_MODE=0
 
 #base_out_folder="/Users/blibby/Development/Utils/shell_scripts/cphoto.sh/test/output"
 #base_out_folder="/Users/blibby/Pictures/Photos/2016"
-base_out_folder="/Volumes/WD_PASSPORT_3GB/Photos/2017/"
+volume="/Volumes/WD_PASSPORT_3TB/"
+base_out_folder="$volume""Photos/2017/"
+base_out_hunting_folder="$volume""Photos-Hunting/2017/"
 base_folder_name=$(date +%Y%m%d)
 interator=0
 
@@ -31,8 +33,10 @@ function buildFolderName()
 
   if [ $# -eq 1 ]; then
 
-    if [ $1 = 'hunting' ]; then
-      echo "Hunting folder"
+    if [ "$1" == "hunting" ]; then
+      echo "Hunting folder - ignore suffix"
+    elif [ "$1" == "drone" ]; then
+      echo "Drone folder - ignore suffix"
     else
       folder_name="$folder_name""-"$1
       echo "Suffix applied:" $1
@@ -55,11 +59,14 @@ source_dir=$1
 
 if [ -d $source_dir ]; then
   #new_path="/Users/blibby/Pictures/Photos/2016/$folder_name"
-  if [ $2 = 'hunting' ]; then
+  if [ "$2" == "hunting" ]; then
     echo "Put this in the hunting folder."
-    new_path="$base_out_folder""hunting""/$folder_name"
+    new_path="$base_out_hunting_folder""$folder_name"
+  elif [ "$2" == "drone" ]; then
+    echo "Put this in the drone folder."
+    new_path="$base_out_folder""drone""/$folder_name"
   else
-    new_path="$base_out_folder""/$folder_name"
+    new_path="$base_out_folder""Catalog""/$folder_name"
   fi
   echo "Creating directory: $new_path"
   
@@ -94,7 +101,7 @@ if [ -d $source_dir ]; then
   if [ $TEST_MODE -eq 1 ]; then
       echo "TEST_MODE: cp -rvp $1 $new_path skipped"
   else
-    cp -rvp "$1" "$new_path"
+    #cp -rvp "$1" "$new_path"
     echo "copying to new path"
   fi
 
