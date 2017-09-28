@@ -101,7 +101,7 @@ if [ -d $source_dir ]; then
   if [ $TEST_MODE -eq 1 ]; then
       echo "TEST_MODE: cp -rvp $1 $new_path skipped"
   else
-    #cp -rvp "$1" "$new_path"
+    cp -rvp "$1" "$new_path"
     echo "copying to new path"
   fi
 
