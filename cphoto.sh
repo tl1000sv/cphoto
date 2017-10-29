@@ -8,6 +8,8 @@ TEST_MODE=0
 
 #base_out_folder="/Users/blibby/Development/Utils/shell_scripts/cphoto.sh/test/output"
 #base_out_folder="/Users/blibby/Pictures/Photos/2016"
+STARTTIME=$(date +%s)
+base_path=""
 volume="/Volumes/WD_PASSPORT_3TB/"
 base_out_folder="$volume""Photos/2017/"
 base_out_hunting_folder="$volume""Photos-Hunting/2017/"
@@ -48,28 +50,36 @@ function buildFolderName()
   echo "building folder_name=" $folder_name
 }
 
-buildFolderName $2
-
-#folder_name="$folder_name""_00-"$2
-
-
-echo "folder_name=" $folder_name
-
 source_dir=$1
 
+# Determine the base folder based on the attributes passed in.
+
 if [ -d $source_dir ]; then
-  #new_path="/Users/blibby/Pictures/Photos/2016/$folder_name"
   if [ "$2" == "hunting" ]; then
     echo "Put this in the hunting folder."
-    new_path="$base_out_hunting_folder""$folder_name"
+    base_path="$base_out_hunting_folder"
+
+    # Do not pass in the suffix
+    buildFolderName
   elif [ "$2" == "drone" ]; then
     echo "Put this in the drone folder."
-    new_path="$base_out_folder""drone""/$folder_name"
+    base_path="$base_out_folder""drone/"
+
+    # Do not pass in the suffix
+    buildFolderName
   else
-    new_path="$base_out_folder""Catalog""/$folder_name"
+    base_path="$base_out_folder""Catalog/"
+
+    # Pass in the suffix
+    buildFolderName $2
   fi
-  echo "Creating directory: $new_path"
   
+  echo "Base path:$base_path"
+  echo "Folder name="$folder_name
+  
+  # Add the folder name.
+  new_path="$base_path""$folder_name"
+  echo "Will be creating directory: $new_path"
 
   COUNTER=0
   MAX_COUNT=25
@@ -77,11 +87,12 @@ if [ -d $source_dir ]; then
     echo The counter is $COUNTER
     if [ -d "$new_path" ]; then
     # Control will enter here if $DIRECTORY exists.
+      echo "Path already exists=" $new_path
       let COUNTER=COUNTER+1
       let interator=interator+1
       echo "iterator=" $interator
       buildFolderName $2
-      new_path="$base_out_folder""/$folder_name"
+      new_path="$base_path""$folder_name"
     else
       let COUNTER=MAX_COUNT+1
       echo Output folder does not exist $folder_name
@@ -95,14 +106,13 @@ if [ -d $source_dir ]; then
     echo "making new path"
   fi
 
-  echo "cp $source_dir $new_path"
-
   # echo "Copying files from $1 to $new_path..."
   if [ $TEST_MODE -eq 1 ]; then
       echo "TEST_MODE: cp -rvp $1 $new_path skipped"
   else
+    echo "Starting copy from $source_dir to $new_path"
+    
     cp -rvp "$1" "$new_path"
-    echo "copying to new path"
   fi
 
   # rsync to preserve file dates
@@ -116,12 +126,15 @@ if [ -d $source_dir ]; then
   else
     ls -al "$new_path"
     open "$new_path"
-    echo "opening new path"
   fi
 
   echo "Remove statement to run:"
   echo "rm $source_dir*"
   echo "rm $source_dir*" | pbcopy
+
+  ENDTIME=$(date +%s)
+  echo "Copy complete - elapsed time:  $(($ENDTIME - $STARTTIME)) seconds"
+
 else 
   echo "Source directory does not exists: $1"
 fi 
