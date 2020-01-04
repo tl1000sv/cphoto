@@ -11,8 +11,8 @@ TEST_MODE=0
 STARTTIME=$(date +%s)
 base_path=""
 volume="/Volumes/WD_PASSPORT_3TB/"
-base_out_folder="$volume""Photos/2019/"
-base_out_hunting_folder="$volume""Photos-Hunting/2019/"
+base_out_folder="$volume""Photos/2020/"
+base_out_hunting_folder="$volume""Photos-Hunting/2020/"
 base_folder_name=$(date +%Y%m%d)
 interator=0
 
